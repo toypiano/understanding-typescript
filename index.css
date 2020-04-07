@@ -1,0 +1,39 @@
+html {
+  box-sizing: border-box;
+}
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+form {
+  width: 300px;
+}
+
+input {
+  margin: 0 auto 1em;
+  font-size: 1rem;
+  display: block;
+  padding: 0.5em 3em;
+  width: 100%;
+  background: lightblue;
+  text-align: center;
+}
+
+button {
+  font-size: 1rem;
+  width: 100%;
+  padding: 0.5em 3em;
+  display: block;
+  border: 0;
+  background: lightblue;
+}
