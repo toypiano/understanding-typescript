@@ -285,7 +285,7 @@ tsc -w # watches all ts files
 
 You can include/ exclude certain files or folders by specifying `exclude` and `include` field in `tsconfig.json`.
 
-```json
+```js
 {
   "exclude": [
     "node_modules" /* Default only if you don't add exclude field.  */,
@@ -299,7 +299,7 @@ You can include/ exclude certain files or folders by specifying `exclude` and `i
 
 You can also target specific files, for example when you're working with smaller projects.
 
-```json
+```js
 {
   "files": ["app.ts"]
 }
@@ -311,7 +311,7 @@ Above setting works as include - exclude.
 
 You can hit `ctrl+space` at the empty string value to see available options.
 
-```json
+```js
 {
   "compilerOptions": {
     "target": "es6" // es6 supports let, const, =>, ..., promise,...
@@ -324,7 +324,7 @@ You can hit `ctrl+space` at the empty string value to see available options.
 If you want TS to only support APIs from certain library, you specify that in:
 (But in general, you don't have to touch the defaults...)
 
-```json
+```js
 {
   "compilerOptions": {
     "lib": [
@@ -339,7 +339,7 @@ If you want TS to only support APIs from certain library, you specify that in:
 
 ### More Options
 
-```json
+```js
 {
   "allowJs": true /* Allow javascript files to be compiled. */,
   "checkJs": true /* Report errors in .js files. */,
@@ -377,7 +377,7 @@ Any folder structure inside source directory will be duplicated inside output fo
 
 `strict` option toggles all the related options at once.
 
-```json
+```js
 {
   "strict": true /* Enable all strict type-checking options. */,
   "noImplicitAny": true /* Yell if type is not assigned properly. You use ts for this. */,
@@ -401,7 +401,7 @@ if (newItem) {
 
 ### Code Quality Options
 
-```json
+```js
 {
   "noUnusedLocals": true /* Report errors on unused locals. */,
   "noUnusedParameters": true /* Report errors on unused parameters. */,
