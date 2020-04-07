@@ -263,26 +263,151 @@ never = anyInput; // No types including "any" aren't assignable to never
 
 ## Typescript Configuration
 
-### Watch Node
+### Watch Mode
+
+Don't quit watch mode before saving your .ts file.
+
+```bash
+tsc app.ts --watch
+```
+
+But with this approach, we still need to target only one specific file.
 
 ### Compiling the Entire Project
 
+```bash
+tsc --init # creates tsconfig.json file
+tsc # compile all ts files in this folder
+tsc -w # watches all ts files
+```
+
 ### Include and Exclude Files
 
-### Setting a Complication Target
+You can include/ exclude certain files or folders by specifying `exclude` and `include` field in `tsconfig.json`.
+
+```json
+{
+  "exclude": [
+    "node_modules" /* Default only if you don't add exclude field.  */,
+    "demo/" /* exclude all files inside demo folder */,
+    "*.dev.ts" /* exclude any files ending with .dev.ts from the root folder */,
+    "**/*.dev.ts" /* exclude above from any folder  */
+  ],
+  "include": ["src/" /* Only include this path - ones in exclude */]
+}
+```
+
+You can also target specific files, for example when you're working with smaller projects.
+
+```json
+{
+  "files": ["app.ts"]
+}
+```
+
+Above setting works as include - exclude.
+
+### Setting a Compilation Target
+
+You can hit `ctrl+space` at the empty string value to see available options.
+
+```json
+{
+  "compilerOptions": {
+    "target": "es6" // es6 supports let, const, =>, ..., promise,...
+  }
+}
+```
 
 ### Understanding TypeScript Libs
 
+If you want TS to only support APIs from certain library, you specify that in:
+(But in general, you don't have to touch the defaults...)
+
+```json
+{
+  "compilerOptions": {
+    "lib": [
+      "dom", // document, console, ...
+      "es6",
+      "dom.iterable",
+      "scripthost"
+    ]
+  }
+}
+```
+
 ### More Options
+
+```json
+{
+  "allowJs": true /* Allow javascript files to be compiled. */,
+  "checkJs": true /* Report errors in .js files. */,
+  "jsx": "preserve" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
+  "declaration": true /* Generates corresponding '.d.ts' file. When you are writing library*/,
+  "declarationMap": true /* Generates a sourcemap for each corresponding '.d.ts' file. */
+}
+```
 
 ### Source Maps
 
+If `"sourceMap"` option is set to `true`, TS creates ~.js.map file which browsers can parse as .ts file, and we can access those files in Source tab in browser dev-tool for debugging.  
+This is really convenient because we can work directly in the source file instead of the compiled version.
+
 ### Rootdir and Outdir
+
+You can set output directory(usually `dist/`) into which TS compiles .ts files.  
+Any folder structure inside source directory will be duplicated inside output folder(nice!).
+
+`rootDir` option specifies the directory of the source folder which works similar to `include` field, but `rootDir` also preserves folder structure inside source folder, while `include` does not.
+(If you want to place all .ts files into some folder without sub-folders, use `include` option)
 
 ### noemit on Error
 
+`"noEmit": true`
+
+- Just check the file for errors but don't compile them plz.
+
+`"noEmitOnError": true`
+
+- Don't compile .ts files if they contain any errors!
+- This is "fail early" approach.
+
 ### Strict Compilation Options
 
+`strict` option toggles all the related options at once.
+
+```json
+{
+  "strict": true /* Enable all strict type-checking options. */,
+  "noImplicitAny": true /* Yell if type is not assigned properly. You use ts for this. */,
+  "strictNullChecks": true /* TS can't see dom to check if this will not return null! (e.g. document.querySelector('.header')!; */,
+  "strictFunctionTypes": true /* Enable strict checking of function types. for classes */,
+  "strictBindCallApply": true /* Enable strict 'bind', 'call', and 'apply' methods on functions. */,
+  "strictPropertyInitialization": true /* Enable strict checking of property initialization in classes. */,
+  "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,
+  "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */
+}
+```
+
+You can add `!` at the end of expression to dodge `strictNullChecks`. But proper way would be using if checks to ensure return value exists.
+
+```ts
+const newItem = document.querySelector('.new-item'); // add ! if you feel lazy.
+if (newItem) {
+  newItem.addEventListener('click', handleNewItemClicked);
+}
+```
+
 ### Code Quality Options
+
+```json
+{
+  "noUnusedLocals": true /* Report errors on unused locals. */,
+  "noUnusedParameters": true /* Report errors on unused parameters. */,
+  "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+  "noFallthroughCasesInSwitch": true /* Report errors for fallthrough cases in switch statement. */
+}
+```
 
 ### Debugging with VSCode
