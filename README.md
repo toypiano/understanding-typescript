@@ -56,7 +56,7 @@ const person: {
 */
 ```
 
-### Array Types
+### Array Types (JS Core)
 
 - Element Type can be flexible or strict
 - TS automatically infers the type(s) of the elements inside an array.
@@ -77,7 +77,7 @@ for (const hobby of person.hobbies) {
 }
 ```
 
-### Tuples(TS only)
+### Tuples
 
 - Fixed-length array.
 - Can specify types at each position
@@ -97,7 +97,7 @@ const person: {
 };
 ```
 
-### Enums(TS only)
+### Enums
 
 Global constant identifiers which maps numbered index(key) into human-readable label(value).
 
@@ -123,22 +123,103 @@ var Role;
 Now Intellisense shows those labels after `Role.` even though those labels are stored as values, not keys
 (This will work great with action-types in redux)
 
-### "Any" Type(TS only)
+### "Any" Type
 
 When you want TS to shut up.
 (If you don't know the type)
 
-### Union Types(TS only)
+### Union Types
 
-### Literal Types(TS only)
+This type OR that type
+
+```ts
+function combine(input1: number | string, input2: number | string) { ...
+```
+
+### Literal Types
+
+Specify primitive value as individual type.  
+Usually used with union types.
+
+```ts
+function combine(
+  input1: number | string,
+  input2: number | string,
+  resultConversion: 'as-number' | 'as-string' // union of literal type
+) { ...
+```
 
 ### Type Aliases
 
+You can create a custom type alias with `type` statement.  
+(like a CSS variable)
+
+```ts
+type Combinable = number | string;
+type ConversionOption = 'as-number' | 'as-string'; // union of literal type
+
+function combine(
+  input1: Combinable,
+  input2: Combinable,
+  resultConversion: ConversionOption
+) {
+```
+
 ### Function Return Types and Void
+
+Functions that doesn't return any value are assigned `void` type implicitly by TS.
+
+```ts
+// you don't need to specify 'void' type here
+function printResult(num: number): void {
+  console.log('Result: ' + num);
+}
+```
 
 ### Function Types
 
+You can assign `Function` type to the variables pointing at functions.
+
+```ts
+let addFunction: Function;
+addFunction = 1 + 1; // Type 'number' is not assignable to type 'Function'
+addFunction = (a: number, b: number) => a + b; // this is fine
+```
+
+But this can't prevent it from being assigned to a wrong function.
+
+```ts
+addFunction = (name: string) => `Hello, ${name}!`; // as long as it's a function...
+```
+
+You can specify the argument types and the return type of the function using fat arrow like:
+
+```ts
+let addFunction: (num1: number, num2: number) => number;
+addFunction = (name: string) => `Hello, ${name}!`; // now you'll get a lot of complaints
+```
+
 ### Function Types and Callbacks
+
+You can also assign types to the callback arguments and return value.
+If you assign `void` to the callback return, TS will not say anything until you actually "use" that value inside the function.
+
+```ts
+function addAndHandle(n1: number, n2: number, cb: (num: number) => void) {
+  const result = n1 + n2;
+  const returnValue = cb(result); // this is fine as long as you don't USE the return value
+  console.log(returnValue); // this is ok (just logging, not doing any computation...)
+
+  const isReturnValueTrue = returnValue === true; // now TS is mad at you.
+  /* This condition will always return 'false' since 
+  the types 'void' and 'boolean' have no overlap.ts(2367) */
+}
+
+addAndHandle(10, 20, (sum) => {
+  console.log(sum);
+  return true; // ts not saying anything here...
+});
+```
 
 ### The Unknown Type
 
