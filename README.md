@@ -223,7 +223,43 @@ addAndHandle(10, 20, (sum) => {
 
 ### The Unknown Type
 
+If you are not sure what type of value a variable will be pointing at, you can assign `unknown` type.  
+"Unknown" type cannot be acknowledged as any other type until it is type-checked manually (i.e. inside if statement).
+Consider `unknown` type whenever you feel like you need to use `any` type. (which will make the variable invisible to ts).
+
+```ts
+let userInput: unknown; // we don't know yet.
+let userName: string;
+
+userInput = 5;
+userInput = 'Hey!'; // still unknown type (can change anytime)
+// userName = userInput; // Error! unknown is not guaranteed to be string.
+
+if (typeof userInput === 'string') {
+  userName = userInput; // TS detects manual type-checking and let it pass.
+}
+
+let anyInput: any;
+anyInput = 1980;
+userName = anyInput; // any type is like a JOKER. It can be "any" type.
+```
+
 ### The Never Type
+
+The `never` type represents the type of values that never occur. (throw | infinite loop)
+
+```ts
+// Function returning never must have unreachable end point!
+function generateError(message: string, code: number): never {
+  throw { message: message, errorCode: code };
+}
+
+let error: string;
+error = generateError('Not Found', 404); // this is fine
+console.log(error); // this is also fine
+let never: never;
+never = anyInput; // No types including "any" aren't assignable to never
+```
 
 ## Typescript Configuration
 
