@@ -162,7 +162,7 @@ function combine(
   input1: Combinable,
   input2: Combinable,
   resultConversion: ConversionOption
-) {
+) { ...
 ```
 
 ### Function Return Types and Void
