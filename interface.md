@@ -91,11 +91,11 @@ joe.haveAChild(); // Joe has a child with Joanne
 
 ## Why interface?
 
-We have an instance foo of class `Bar` and because `Bar` implements `Baz` interface, we know that we can clear know that foo has all `Baz` property and methods on it. This way, we don't have to know every property and methods inside `Bar` and still use `Baz` method on foo.
+We have an instance foo of class `Bar` and because `Bar` implements `Baz` interface, we can be sure that foo has all `Baz` property and methods on it. This way, we don't have to know all the properties and methods inside `Bar` but still can use `Baz` method on foo with confidence.
 
 ## `readonly` modifier in `interface`
 
-You cannot add `private` or `public` inside interface, but you can add `readonly` modifier in font of a property to make it impossible to override the initial value like "const".
+You cannot add `private` or `public` inside interface, but you can add `readonly` modifier in front of a property name to make it impossible to override the initial value similar to "const".
 
 ```ts
 interface Greetable {
@@ -106,7 +106,7 @@ interface Greetable {
 
 ## Extending interface
 
-Interface can extend other interface like classes using `extends`
+Interface can extend other interfaces as in classes using `extends`
 
 ```ts
 interface Named {
@@ -118,7 +118,7 @@ interface Greetable extends Named {
 }
 ```
 
-You can also extend multiple interfaces unlike classes (because they don't persist into runtime)
+Unlike classes, an interface can extend multiple interfaces (because they don't persist into runtime)
 
 ```ts
 interface Greetable extends Named, French {
@@ -138,7 +138,7 @@ interface AddFn {
 }
 ```
 
-But for function typing, `type` statement is more commonly used:
+But for function type, `type` statement is more commonly used:
 
 ```ts
 type AddFn = (a: number, b: number) => number;
@@ -156,9 +156,9 @@ interface Named {
 }
 ```
 
-If you made a property inside an interface optional, and want to go the class that extends the interface and make its method to work with/without that property, you need to add `?` inside class constructor.
+If you specified a property inside an interface as optional, and also want to go the classes that extend that interface and make sure their methods can work with/without that (optional) property, you can add `?` when declaring class properties with class constructor.
 <br>
-Also, you may need to add if check if you are using optional properties inside your method:
+Also, you may need to add 'if' check if you want to use optional properties inside your method:
 
 ```ts
 interface Named {
@@ -176,7 +176,7 @@ class Person implements Greetable {
   // now works with/without name
   greet(phrase: string) {
     if (this.name) {
-      // name might be `undefined`
+      // name could be `undefined`
       console.log(phrase + ' ' + this.name);
     } else {
       console.log('Hi!');
@@ -193,10 +193,10 @@ Providing default parameter value inside constructor works similar to making the
 ```ts
 class Person implements Greetable {
   constructor(public name: string = '') {}
-  // now works with/without name
+  // now works with/without name (will be assigned an empty string when name is not given)
   greet(phrase: string) {
     if (this.name) {
-      // name might be `undefined`
+      // name could be `undefined`
       console.log(phrase + ' ' + this.name);
     } else {
       console.log('Hi!');
