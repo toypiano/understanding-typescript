@@ -4,7 +4,12 @@ In Typescript, interface defines the structure of an object and works as a bindi
 
 Most of the time, interface can be replaced with custom type, but it is more common to use interface for defining structure for **objects** and **classes**.
 
-## `interface` vs `type`
+## Interface vs Class
+
+- Interface can't be instantiated and are not compiled
+- Classes can be instantiated and are compiled
+
+## Interface vs Custom Type
 
 ### Interface
 
@@ -34,6 +39,7 @@ user1.greet('How you doing,'); // How you doing, Trevor
 
 ### Custom Type (alias)
 
+- You can store / describe arbitrary types like union types.
 - You can also define other types with `type` keyword.
 
 ```ts
