@@ -65,6 +65,8 @@ function printEmployeeInformation(emp: UnknownEmployee) {
 
 In this case, you can implement "type guard" to avoid warning:
 
+> Type guards helps you avoid runtime error by checking types before you try to do something with the values.
+
 ```ts
 function printEmployeeInformation(emp: UnknownEmployee) {
   console.log('Name: ' + emp.name);
@@ -204,4 +206,180 @@ const userName = <HTMLInputElement>document.getElementById('name');
 // Now it's YOUR RESPONSIBILITY that userName is really the object you type-casted as.
 // (possible run-time error)
 const userName = document.getElementById('name') as HTMLInputElement;
+```
+
+## Index Properties
+
+You want to create an object with some key-value pairs where keys have different names, but their values have the same type that serve similar purposes, i.e. you are creating a dictionary object
+
+- e.g.) actionTypes.FETCH_SUCCESS | FETCH_FAIL or error.mail | error.username
+  ```ts
+  const error = {
+    email: 'Not a valid email',
+    username: 'Must start with letter',
+    ...
+  };
+  ```
+
+You might even want to add new key-value pair dynamically into the object, but usually you need to specify the key name first then assign a type to it.
+
+`index type` tells TS that if a property with the given key-type is added to the object, it must have the value of the specified type.
+
+```ts
+interface ErrorContainer {
+  [prop: string]: string;
+}
+
+const errorBag: ErrorContainer = {
+  email: 'Not a valid email!',
+  id🚨: 3, // If you provided string type key name, value must be string
+```
+
+Note that integer properties are sorted in iteration, but they are still strings.
+
+```ts
+const errorBag: ErrorContainer = {
+  email: 'Not a valid email!',
+  0: 'InputError', // you can dynamically add props
+  1🚨: 999, // 1(key) is string. Its value must be a string!
+```
+
+https://javascript.info/object#property-names-limitations
+
+> Property names (keys) must be either strings or symbols. Other types are automatically converted to strings.
+
+You can also specify other properties that should exist in the object:
+
+```ts
+interface ErrorContainer {
+  id: string;
+  [prop: string ]: string;
+}
+// errorBag must have id prop!
+const errorBag🚨: ErrorContainer = {
+  email: 'Not a valid email!'
+}
+```
+
+Keys with the same type cannot be different types at the same time.
+
+- string & number => always false
+- string | number => always true
+
+```ts
+interface ErrorContainer {
+  [prop: string ]: string;
+  [key: string]: number;🚨 // This doesn't make sense.
+}
+```
+
+This is fine:
+
+```ts
+interface ErrorContainer {
+  [prop: string]: string | number;
+}
+```
+
+## Function Overloads
+
+```ts
+type Combinable = string | number;
+type Numeric = number | boolean;
+type Universal = Combinable & Numeric;
+
+function add(a: Combinable, b: Combinable) {
+  if (typeof a === 'string' || typeof b === 'string') {
+    return a.toString() + b.toString();
+  }
+  return a + b;
+}
+
+// TS doesn't know if Combinable has the method, "split"
+const result = add("Hello", " world").split🚨(' ');
+```
+
+In this example, `add` doesn't have any return type specified, so TS will infer it as `Combinable` because it includes all the possible type that the parameters can have.  
+However, even though you know that you'll get a string if you pass two string values into add, TS doesn't know that because it doesn't analyze what add function does inside its codeblock.
+
+So if your function can return a value with different types depending on the types of the arguments, you can teach TS what type that function return will be based on its input type.
+
+```ts
+// function overloads for "add"
+function add(a: number, b: number): number;
+function add(a: string, b: number): string;
+function add(a: number, b: string): string;
+function add(a: string, b: string): string;
+function add(a: Combinable, b: Combinable) {
+  // type-guard
+  if (typeof a === 'string' || typeof b === 'string') {
+    return a.toString() + b.toString();
+  }
+  return a + b;
+}
+// Now TS knows this returns string type that has 'split' method.
+const result = add('Hello', ' world').split(' ');
+```
+
+Note that if you add an overload for only one possible case, TS will stop inferring the return type and only refer to the overload you provided for function returns AND parameters.
+
+```ts
+function add(a: string, b: string): string;
+function add(a: Combinable, b: Combinable) {
+  // type-guard
+  if (typeof a === 'string' || typeof b === 'string') {
+    return a.toString() + b.toString();
+  }
+  return a + b;
+}
+
+const result = add("Hello", " world").split(' '); // this is fine, but...
+const result2 = add("test", 2🚨); // 2 is not string
+const result3 = add(90🚨 , "Banstock"); // 90 is not string
+const result4 = add(1🚨,1); // 1 is not string
+```
+
+Therefore, if you are going to add an overload to a function, you have to add overloads for all possible combinations. Also, you have to order overloads from more detailed to more general because TS uses the first overload that matches.
+
+## Optional Chaining
+
+Optional chaining is a TS feature similar to JavaScript's short-circuit evaluation. It allows run-time code to silently fail if the referencing property doesn't exist in the object (e.g. data is being fetched asynchronously)
+
+```ts
+const data = {
+  id: 'u1',
+  name: 'Max',
+  // job: { title: 'CEO', description: 'My own company' },
+};
+
+console.log(data?.job?title)
+```
+
+In Js, this is similar to:
+
+```js
+// JS short-circuit
+console.log(data && data.job && data.job.title); // undefined
+console.log(data.job.title); // throws TypeError
+```
+
+## Nullish Coalescing
+
+Javascript groups [ 0, '', null, undefined ] together as "falsy" values.  
+Therefore in the following code, you'll get `DEFAULT` fallback value;
+
+```js
+const userInput = 0;
+const storedData = userInput || 'DEFAULT';
+console.log(storedData); // DEFAULT
+```
+
+If you want to use 0 or an empty string as truthy value, then you can use Typescripts' `nullish coalescing operator`, `??`.
+
+```ts
+const userInput = 0;
+
+// you want fallback only on null or undefined. not 0 or ''
+const storedData = userInput && 'DEFAULT';
+console.log(storedData); // 0
 ```
