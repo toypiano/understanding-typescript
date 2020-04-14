@@ -71,14 +71,17 @@ function merge<T, U>(objA: T, objB: U) {
 
 // now TS understands that merge returns T & U
 mergedObj.name;
-/* Return type inferred by TS
+```
+
+Now the types for mergedObj is inferred by TS as:
+
+```ts
 const mergedObj: {
-    name: string;
-    hobbies: string;
+  name: string;
+  hobbies: string;
 } & {
-    age: number;
-}
-*/
+  age: number;
+};
 ```
 
 ### TS object intersection type vs union type
