@@ -196,6 +196,8 @@ console.log(extractAndConvert({name: 'Hayoun'}, 'age'🚨));
 
 You can also apply constraints to generic classes and make it work with any type as long as it matches the given constraints.
 
+> Generic Classes are a way to say that a particular type depends on another type.
+
 ```ts
 // only works with primitive types
 class DataStorage<T extends string | number | boolean> {
