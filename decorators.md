@@ -288,7 +288,7 @@ In the above example:
   - whose type variable `T` extends a class (constructor function)
     - that takes arbitrary number of arguments of `any` type, destructured into `args` array.
     - and instantiates objects with "name" property.
-    - properties not specified here cannot be access via `this` inside constructor.
+    - properties not specified here cannot be accessed via `this` inside constructor.
   ```ts
   function <T extends { new (...args: any[]): { name: string } }>
   ```
@@ -328,13 +328,18 @@ In the above example:
 ## Other Decorator Return Types
 
 Only class, method, and accessor decorators can return.
-Return values from method and accessor decorator update their descriptor properties.  
-e.g. `enumerable`, `configurable`, etc...
 
-## Example: "Autobind" Decorator
+- Any return value from Property decorator will be ignored.
+
+Return values from method and accessor decorator update their descriptor properties.  
+ e.g. `enumerable`, `configurable`, etc...
+
+## Example: "Autobind" Method Decorator
 
 Create a method decorator, `Autobind`
 
+- You can use `PropertyDescriptor`'s `get` method to add new logic to the decorated methods.
+  - getter method will be called whenever decorated method is called.
 - Takes (target: `any`, targetName: `string`, descriptor: `PropertyDescriptor` )
 - Returns new descriptor object that updates old descriptor
 
@@ -376,10 +381,32 @@ button.addEventListener('click', p.showMessage);
 Create a 3rd party library where:
 
 - Property decorators registers decorated property and validation constraints to the global config object.
-- A validator function will be passed a validating instance and will access global config for related information:
-  - Name of the constructor of the decorated property
+- A validator function will be passed a validating instance and will access global config for validation info:
+  - Name of the constructor(class) of the decorated property
+    - All instances created with this constructor will be applied decorated validation on their properties.
   - Name of the decorated property
-  - Array of registered validation constraints
+  - Array of registered validation constraints with that property
+
+```ts
+const registeredValidators = {
+  Course: {
+    title: ['required'],
+    price: ['positive']
+  },
+  Instructor: {
+    name: ['required'],
+    id: ['required', 'min_6', 'max_6']
+  },
+  Student: {
+    name: ['required'],
+    id: ['required', 'min_6'],
+    courses: ['exists']
+  },
+  ...
+}
+
+```
+
 - The validator function will loop through each constraints and finally return the result with true | false.
 
 ```ts
