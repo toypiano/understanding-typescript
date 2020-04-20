@@ -1,0 +1,132 @@
+:root {
+  --cl-red: #ff0062;
+  --cl-red-dark: #a80041;
+  --cl-red-light: #ffe4ee;
+  --cl-blue: #0044ff;
+  --cl-blue-light: #d6e1ff;
+  --cl-gray: #575757;
+  --cl-light: #f7f7f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+label,
+input,
+textarea {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+label {
+  font-weight: bold;
+}
+
+input,
+textarea {
+  font: inherit;
+  padding: 0.2rem 0.4rem;
+  width: 100%;
+  /* 480px */
+  max-width: 30rem;
+  border: 1px solid #ccc;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  background: #fff5f9;
+}
+
+button {
+  font: inheritl;
+  background: var(--cl-red);
+  border: 1px solid var(--cl-red);
+  cursor: pointer;
+  color: var(--cl-light);
+  padding: 0.75rem 1rem;
+}
+
+button:focus {
+  outline: none;
+}
+
+button:hover,
+button:active {
+  background: var(--cl-red-dark);
+  border-color: var(--cl-red-dark);
+}
+
+.projects {
+  margin: 1rem;
+  border: 1px solid var(--cl-red);
+}
+
+.projects header {
+  background: var(--cl-red);
+  height: 3.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#finished-projects {
+  border-color: var(--cl-blue);
+}
+#finished-projects header {
+  background: var(--cl-blue);
+}
+
+.projects ul {
+  list-style: none;
+  margin: 0;
+  padding: 1rem;
+}
+
+.projects li {
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.26);
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.projects li h2 {
+  color: var(--cl-red);
+  margin: 0.5rem 0;
+}
+
+#finished-projects li h2 {
+  color: var(--cl-blue);
+}
+
+.projects li h3 {
+  color: var(--cl-gray);
+  font-size: 1rem;
+}
+
+.project li p {
+  margin: 0;
+}
+
+.droppable {
+  background: var(--cl-red-light);
+}
+
+#finished-projects .droppable {
+  background: var(--cl-blue-light);
+}
+
+#user-input {
+  margin: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--cl-red);
+  background: var(--cl-light);
+}
