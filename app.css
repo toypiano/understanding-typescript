@@ -18,6 +18,7 @@ html {
 
 body {
   margin: 0;
+  font-size: 1.2rem;
 }
 
 label,
@@ -129,4 +130,8 @@ button:active {
   padding: 1rem;
   border: 1px solid var(--cl-red);
   background: var(--cl-light);
+}
+
+#app {
+  margin: 3em 2em;
 }
