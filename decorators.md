@@ -136,7 +136,36 @@ class Person {
 You can also set decorators on class properties(members).  
 Property decorators will be passed:
 
-- ( static member: constructor function | instance member: prototype of the object ) as 1st argument
+```ts
+function Log(target: any, propertyName: string | Symbol) {
+  console.log('[Log target:]', target);
+  console.log('[Log name:]', propertyName);
+}
+
+class Product {
+  @Log
+  static classId = 'P02733';
+  @Log
+  title: string;
+  constructor(t: string) {
+    this.title = t;
+  }
+}
+```
+
+- 1st argument:
+  - static member: constructor function
+  ```ts
+  class Product {
+    constructor(t) {
+      this.title = t;
+    }
+  }
+  ```
+  - instance member: prototype of the object
+  ```ts
+  { constructor: class Product, __proto__: Object }
+  ```
 - and member `name` as the 2nd argument.
 - and will be called right after the class definition is registered with javascript.
 
