@@ -64,11 +64,42 @@ class ProjectInput {
     this.attach();
   }
 
+  private getUserInputs(): [string, string, number] | void {
+    //returns tuple | void (if validation fails)
+    const titleValue = this.titleInputElement.value;
+    const descriptionValue = this.descriptionInputElement.value;
+    const peopleValue = this.peopleInputElement.value;
+
+    // not a reusable validation. only for now.
+    if (
+      titleValue.trim().length === 0 ||
+      descriptionValue.trim().length === 0 ||
+      peopleValue.trim().length === 0
+    ) {
+      alert('You must fill in all the inputs!');
+      return; // we have to return specified type(s)
+    } else {
+      return [titleValue, descriptionValue, +peopleValue];
+    }
+  }
+
+  private clearInputs() {
+    this.titleInputElement.value = '';
+    this.descriptionInputElement.value = '';
+    this.peopleInputElement.value = '';
+  }
+
   // use decorator - otherwise we have to .bind(this) every time we use this method
   @autobind
   private submitHandler(e: Event) {
     e.preventDefault();
-    console.log(this.titleInputElement.value);
+    const userInputs = this.getUserInputs();
+    if (Array.isArray(userInputs)) {
+      // To destructure array element, you have to put inside the type-guard!
+      const [title, desc, people] = userInputs;
+      console.log(title, desc, people);
+      this.clearInputs();
+    }
   }
 
   // add listeners to elements
