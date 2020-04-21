@@ -14,14 +14,15 @@ class ProjectInput {
     this.templateElement = document.getElementById(
       'project-input'
     )! as HTMLTemplateElement;
-    // typecasting with as (you could also use <> before the expression)
+    // typecasting with 'as' (you could also use <> before the expression)
     this.app = document.getElementById('app')! as HTMLDivElement;
 
     // when this class creates an instance, we want to immediately render the form that belongs to this element. So we'll do it in the constructor.
     const importedNode = document.importNode(
       this.templateElement.content,
-      true
-    ); //deep=true
+      true //deep=true
+    ); // returns DocumentFragment
+
     this.formElement = importedNode.firstElementChild as HTMLFormElement;
     this.attach();
   }
