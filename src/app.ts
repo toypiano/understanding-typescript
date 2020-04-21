@@ -4,6 +4,24 @@ Goal:
 2. populate template with data
 3. render it
 */
+
+/* Decorators - enable "experimentalDecorators" in tsconfig.json */
+
+// using underscore as argument name suppresses "noUnused" warnings
+function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
+  const decoratedMethod = descriptor.value;
+  const updatedDescriptor: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const boundFn = decoratedMethod.bind(this);
+      return boundFn;
+    },
+  };
+  return updatedDescriptor;
+}
+
+/* Classes */
+
 class ProjectInput {
   // became available with tsconfig.compilerOptions.lib: ["dom"]
   templateElement: HTMLTemplateElement;
@@ -46,6 +64,8 @@ class ProjectInput {
     this.attach();
   }
 
+  // use decorator - otherwise we have to .bind(this) every time we use this method
+  @autobind
   private submitHandler(e: Event) {
     e.preventDefault();
     console.log(this.titleInputElement.value);
@@ -54,7 +74,7 @@ class ProjectInput {
   // add listeners to elements
   private configure() {
     // watchout for 'this' when adding eventListeners
-    this.formElement.addEventListener('submit', this.submitHandler.bind(this));
+    this.formElement.addEventListener('submit', this.submitHandler);
   }
 
   private attach() {
