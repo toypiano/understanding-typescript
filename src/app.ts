@@ -9,6 +9,10 @@ class ProjectInput {
   templateElement: HTMLTemplateElement;
   app: HTMLDivElement;
   formElement: HTMLFormElement;
+  titleInputElement: HTMLInputElement;
+  descriptionInputElement: HTMLInputElement;
+  peopleInputElement: HTMLInputElement;
+
   constructor() {
     // select this element which is not null and of HTMLTemplateElement type.
     this.templateElement = document.getElementById(
@@ -24,7 +28,33 @@ class ProjectInput {
     ); // returns DocumentFragment
 
     this.formElement = importedNode.firstElementChild as HTMLFormElement;
+    // write css first, then add id (or class) to the element before render
+    this.formElement.id = 'user-input'; // interacting with element
+
+    // populating fields with DOM elements
+    this.titleInputElement = this.formElement.querySelector(
+      '#title'
+    ) as HTMLInputElement;
+    this.descriptionInputElement = this.formElement.querySelector(
+      '#description'
+    ) as HTMLInputElement;
+    this.peopleInputElement = this.formElement.querySelector(
+      '#people'
+    ) as HTMLInputElement;
+
+    this.configure();
     this.attach();
+  }
+
+  private submitHandler(e: Event) {
+    e.preventDefault();
+    console.log(this.titleInputElement.value);
+  }
+
+  // add listeners to elements
+  private configure() {
+    // watchout for 'this' when adding eventListeners
+    this.formElement.addEventListener('submit', this.submitHandler.bind(this));
   }
 
   private attach() {

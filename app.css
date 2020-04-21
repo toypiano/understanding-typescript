@@ -131,7 +131,3 @@ button:active {
   border: 1px solid var(--cl-red);
   background: var(--cl-light);
 }
-
-#app {
-  margin: 3em 2em;
-}
