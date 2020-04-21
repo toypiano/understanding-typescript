@@ -5,6 +5,41 @@ Goal:
 3. render it
 */
 
+/* Validation */
+interface Validatable {
+  value: string | number;
+  // validators are optional
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+}
+
+function validate(input: Validatable) {
+  let isValid = true;
+  if (input.required) {
+    // only string has trim and length
+    isValid = isValid && input.value.toString().trim().length !== 0;
+  }
+  // validator check + type-guarding!
+  // if minLength === 0, it becomes falsy even though it means the constraint of zero min-length.
+  //
+  if (input.minLength != null && typeof input.value === 'string') {
+    isValid = isValid && input.value.length >= input.minLength;
+  }
+  if (input.maxLength != null && typeof input.value === 'string') {
+    isValid = isValid && input.value.length <= input.maxLength;
+  }
+  if (input.min != null && typeof input.value === 'number') {
+    isValid = isValid && input.value >= input.min;
+  }
+  if (input.max != null && typeof input.value === 'number') {
+    isValid = isValid && input.value <= input.max;
+  }
+  return isValid;
+}
+
 /* Decorators - enable "experimentalDecorators" in tsconfig.json */
 
 // using underscore as argument name suppresses "noUnused" warnings
@@ -70,13 +105,25 @@ class ProjectInput {
     const descriptionValue = this.descriptionInputElement.value;
     const peopleValue = this.peopleInputElement.value;
 
+    const title: Validatable = {
+      value: titleValue,
+      required: true,
+    };
+    const description: Validatable = {
+      value: descriptionValue,
+      required: true,
+      minLength: 5,
+    };
+    const people: Validatable = {
+      value: +peopleValue, // always convert numeric input value to number!!!
+      required: true,
+      min: 1,
+      max: 99,
+    };
+
     // not a reusable validation. only for now.
-    if (
-      titleValue.trim().length === 0 ||
-      descriptionValue.trim().length === 0 ||
-      peopleValue.trim().length === 0
-    ) {
-      alert('You must fill in all the inputs!');
+    if (!validate(title) || !validate(description) || !validate(people)) {
+      alert('Please enter valid input!');
       return; // we have to return specified type(s)
     } else {
       return [titleValue, descriptionValue, +peopleValue];
