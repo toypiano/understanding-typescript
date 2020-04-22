@@ -49,7 +49,7 @@ textarea:focus {
 }
 
 button {
-  font: inheritl;
+  font: inherit;
   background: var(--cl-red);
   border: 1px solid var(--cl-red);
   cursor: pointer;
