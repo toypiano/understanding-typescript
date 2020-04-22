@@ -1,3 +1,47 @@
+/* State Management */
+
+/**
+ * Create singleton state instance
+ */
+let id = 0;
+class ProjectState {
+  // start out by setting type as any
+  private listeners: any = [];
+  private projects: any[] = [];
+
+  // ts singleton pattern
+  private static instance: ProjectState;
+  private constructor() {}
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  addListener(listenerFn: Function) {
+    this.listeners.push(listenerFn);
+  }
+
+  addProject(title: string, description: string, people: number) {
+    const newProject = {
+      id: (id++).toString(),
+      title,
+      description,
+      people,
+    };
+    this.projects.push(newProject);
+    // When adding new project, loop through listeners and call them passing in the project list
+    for (const listenerFn of this.listeners) {
+      listenerFn(this.projects.slice()); // pass the copy (immutable pattern)
+    }
+  }
+}
+
+// we only have one instance of ProjectState in our entire application
+const projectState = ProjectState.getInstance();
+
 /* Validation */
 interface Validatable {
   value: string | number;
@@ -54,22 +98,46 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   app: HTMLDivElement;
   sectionElement: HTMLElement;
+  assignedProjects: any[];
   // ts constructor shorthand
   constructor(private type: 'active' | 'completed') {
     this.templateElement = document.getElementById(
       'project-list'
     )! as HTMLTemplateElement;
     this.app = document.getElementById('app')! as HTMLDivElement;
+    this.assignedProjects = [];
     const importedNode = document.importNode(
       this.templateElement.content,
       true
     );
     this.sectionElement = importedNode.firstElementChild as HTMLFormElement;
     this.sectionElement.classList.add(`project--${this.type}`);
+
+    // add listener: cb will be passed projects from state
+    projectState.addListener((projects: any[]) => {
+      // callback will be called when new project is added to the state instance
+      this.assignedProjects = projects; // store state into local property to share across methods
+      this.renderProjects();
+    });
+
     this.attach();
     this.renderContent();
   }
 
+  private renderProjects() {
+    // this will run when new project is added to the state
+    const ulElement = document.getElementById(
+      `project-list--${this.type}`
+    )! as HTMLUListElement;
+    for (const projectItem of this.assignedProjects) {
+      // create elem, inject data, then render
+      const li = document.createElement('li');
+      li.textContent = projectItem.title;
+      ulElement.appendChild(li);
+    }
+  }
+
+  // this runs when ProjectList instantiates.
   private renderContent() {
     const listId = `project-list--${this.type}`;
     this.sectionElement.querySelector('ul')!.id = listId;
@@ -173,6 +241,8 @@ class ProjectInput {
       // To destructure array element, you have to put inside the type-guard!
       const [title, desc, people] = userInputs;
       console.log(title, desc, people);
+      // set state on singleton state instance
+      projectState.addProject(title, desc, people);
       this.clearInputs();
     }
   }
