@@ -1,10 +1,3 @@
-/* 
-Goal:
-1. get the user input value
-2. populate template with data
-3. render it
-*/
-
 /* Validation */
 interface Validatable {
   value: string | number;
@@ -57,6 +50,41 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
 
 /* Classes */
 
+class ProjectList {
+  templateElement: HTMLTemplateElement;
+  app: HTMLDivElement;
+  sectionElement: HTMLElement;
+  // ts constructor shorthand
+  constructor(private type: 'active' | 'completed') {
+    this.templateElement = document.getElementById(
+      'project-list'
+    )! as HTMLTemplateElement;
+    this.app = document.getElementById('app')! as HTMLDivElement;
+    const importedNode = document.importNode(
+      this.templateElement.content,
+      true
+    );
+    this.sectionElement = importedNode.firstElementChild as HTMLFormElement;
+    this.sectionElement.classList.add(`project--${this.type}`);
+    this.attach();
+    this.renderContent();
+  }
+
+  private renderContent() {
+    const listId = `project-list--${this.type}`;
+    this.sectionElement.querySelector('ul')!.id = listId;
+    this.sectionElement.querySelector('h2')!.textContent =
+      this.type.toUpperCase() + ' PROJECTS';
+  }
+
+  private attach() {
+    this.app.insertAdjacentElement('beforeend', this.sectionElement);
+  }
+}
+
+/**
+ * Get user input value and populate template with it and render template
+ */
 class ProjectInput {
   // became available with tsconfig.compilerOptions.lib: ["dom"]
   templateElement: HTMLTemplateElement;
@@ -82,7 +110,7 @@ class ProjectInput {
 
     this.formElement = importedNode.firstElementChild as HTMLFormElement;
     // write css first, then add id (or class) to the element before render
-    this.formElement.id = 'user-input'; // interacting with element
+    this.formElement.classList.add('user-input'); // interacting with element
 
     // populating fields with DOM elements
     this.titleInputElement = this.formElement.querySelector(
@@ -166,3 +194,5 @@ class ProjectInput {
 
 // Instantiate to render
 const projectInput = new ProjectInput();
+const activeProjectList = new ProjectList('active');
+const completedProjectList = new ProjectList('completed');

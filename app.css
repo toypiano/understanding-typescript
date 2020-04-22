@@ -1,8 +1,8 @@
 :root {
-  --cl-red: #ff0062;
-  --cl-red-dark: #a80041;
+  --cl-red: #eb1111;
+  --cl-red-dark: #991313;
   --cl-red-light: #ffe4ee;
-  --cl-blue: #0044ff;
+  --cl-blue: #1363e2;
   --cl-blue-light: #d6e1ff;
   --cl-gray: #575757;
   --cl-light: #f7f7f7;
@@ -78,12 +78,13 @@ button:active {
   display: flex;
   justify-content: center;
   align-items: center;
+  color: var(--cl-light);
 }
 
-#finished-projects {
+.project--completed {
   border-color: var(--cl-blue);
 }
-#finished-projects header {
+.project--completed header {
   background: var(--cl-blue);
 }
 
@@ -104,7 +105,7 @@ button:active {
   margin: 0.5rem 0;
 }
 
-#finished-projects li h2 {
+.project--completed li h2 {
   color: var(--cl-blue);
 }
 
@@ -121,11 +122,11 @@ button:active {
   background: var(--cl-red-light);
 }
 
-#finished-projects .droppable {
+.project--completed .droppable {
   background: var(--cl-blue-light);
 }
 
-#user-input {
+.user-input {
   margin: 1rem;
   padding: 1rem;
   border: 1px solid var(--cl-red);
