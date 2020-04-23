@@ -21,20 +21,32 @@ class Project {
 // using type to denote function type in one line.
 // we don't usually care about return values from listener
 // because it generally takes some value and create some side-effects with it.
-type Listener = (items: Project[]) => void;
+type Listener<T> = (items: T[]) => void;
 /**
  * Create singleton state instance
  */
-let id = 0;
-class ProjectState {
+
+class State<T> {
+  // protected properties are used to extend private properties
+  // private properties in base classes cannot be accessed in inheriting classes.
+  protected listeners: Listener<T>[] = [];
+  addListener(listenerFn: Listener<T>) {
+    this.listeners.push(listenerFn);
+  }
+}
+
+class ProjectState extends State<Project> {
   // start out by setting type as any
-  private listeners: Listener[] = [];
   private projects: Project[] = [];
+  private static id: number;
 
   // ts singleton pattern
   private static instance: ProjectState;
 
-  private constructor() {}
+  private constructor() {
+    super();
+    ProjectState.id = 0;
+  }
 
   static getInstance() {
     if (this.instance) {
@@ -44,13 +56,9 @@ class ProjectState {
     return this.instance;
   }
 
-  addListener(listenerFn: Listener) {
-    this.listeners.push(listenerFn);
-  }
-
   addProject(title: string, description: string, people: number) {
     const newProject = new Project(
-      (id++).toString(),
+      (ProjectState.id++).toString(),
       title,
       description,
       people,
@@ -120,26 +128,59 @@ function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
 
 /* Classes */
 
-class ProjectList {
+// Component Base Class
+// abstract classes can never be instantiated but can only be extended
+abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   templateElement: HTMLTemplateElement;
-  app: HTMLDivElement;
-  sectionElement: HTMLElement;
-  assignedProjects: Project[];
-  // ts constructor shorthand
-  // not using ProjectStatus enum since we need this for string literal
-  constructor(private type: 'active' | 'completed') {
+  hostElement: T;
+  element: U;
+  constructor(
+    templateId: string,
+    hostElementId: string,
+    insertAtStart: boolean,
+    newElementClass?: string // optional paramter must come at the end
+  ) {
     this.templateElement = document.getElementById(
-      'project-list'
+      templateId
     )! as HTMLTemplateElement;
-    this.app = document.getElementById('app')! as HTMLDivElement;
-    this.assignedProjects = [];
+    this.hostElement = document.getElementById(hostElementId)! as T;
     const importedNode = document.importNode(
       this.templateElement.content,
       true
     );
-    this.sectionElement = importedNode.firstElementChild as HTMLFormElement;
-    this.sectionElement.classList.add(`project--${this.type}`);
+    this.element = importedNode.firstElementChild as U;
+    if (newElementClass) {
+      this.element.classList.add(newElementClass);
+    }
+    this.attach(insertAtStart);
+  }
+  private attach(insertAtBeginning: boolean) {
+    this.hostElement.insertAdjacentElement(
+      insertAtBeginning ? 'afterbegin' : 'beforeend',
+      this.element
+    );
+  }
+  // enforce child class to implement this method
+  abstract configure(): void;
+  abstract renderContent(): void;
+  // you cannot have private abstract class
+}
 
+class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+  // property specific to this class
+  assignedProjects: Project[];
+  // ts constructor shorthand
+  // not using ProjectStatus enum since we need this for string literal
+  constructor(private type: 'active' | 'completed') {
+    super('project-list', 'app', false, `project--${type}`); // can't use this before super
+    this.assignedProjects = [];
+    // not calling these in the base class because
+    // we might need to setup some dependencies after super()
+    this.configure();
+    this.renderContent();
+  }
+
+  configure() {
     // add listener: cb will be passed projects from state
     projectState.addListener((projects: Project[]) => {
       // callback will be called when new project is added to the state instance
@@ -153,9 +194,14 @@ class ProjectList {
       this.assignedProjects = filteredProjects; // store state into local property to share across methods
       this.renderProjects();
     });
-
-    this.attach();
-    this.renderContent();
+  }
+  // this runs when ProjectList instantiates.
+  renderContent() {
+    // abstract private method is not available in ts
+    const listId = `project-list--${this.type}`;
+    this.element.querySelector('ul')!.id = listId;
+    this.element.querySelector('h2')!.textContent =
+      this.type.toUpperCase() + ' PROJECTS';
   }
 
   private renderProjects() {
@@ -173,63 +219,31 @@ class ProjectList {
       ulElement.appendChild(li);
     }
   }
-
-  // this runs when ProjectList instantiates.
-  private renderContent() {
-    const listId = `project-list--${this.type}`;
-    this.sectionElement.querySelector('ul')!.id = listId;
-    this.sectionElement.querySelector('h2')!.textContent =
-      this.type.toUpperCase() + ' PROJECTS';
-  }
-
-  private attach() {
-    this.app.insertAdjacentElement('beforeend', this.sectionElement);
-  }
 }
 
 /**
  * Get user input value and populate template with it and render template
  */
-class ProjectInput {
+class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   // became available with tsconfig.compilerOptions.lib: ["dom"]
-  templateElement: HTMLTemplateElement;
-  app: HTMLDivElement;
-  formElement: HTMLFormElement;
   titleInputElement: HTMLInputElement;
   descriptionInputElement: HTMLInputElement;
   peopleInputElement: HTMLInputElement;
 
   constructor() {
-    // select this element which is not null and of HTMLTemplateElement type.
-    this.templateElement = document.getElementById(
-      'project-input'
-    )! as HTMLTemplateElement;
-    // typecasting with 'as' (you could also use <> before the expression)
-    this.app = document.getElementById('app')! as HTMLDivElement;
-
-    // when this class creates an instance, we want to immediately render the form that belongs to this element. So we'll do it in the constructor.
-    const importedNode = document.importNode(
-      this.templateElement.content,
-      true //deep=true
-    ); // returns DocumentFragment
-
-    this.formElement = importedNode.firstElementChild as HTMLFormElement;
-    // write css first, then add id (or class) to the element before render
-    this.formElement.classList.add('user-input'); // interacting with element
+    super('project-input', 'app', true, 'user-input');
 
     // populating fields with DOM elements
-    this.titleInputElement = this.formElement.querySelector(
+    this.titleInputElement = this.element.querySelector(
       '#title'
     ) as HTMLInputElement;
-    this.descriptionInputElement = this.formElement.querySelector(
+    this.descriptionInputElement = this.element.querySelector(
       '#description'
     ) as HTMLInputElement;
-    this.peopleInputElement = this.formElement.querySelector(
+    this.peopleInputElement = this.element.querySelector(
       '#people'
     ) as HTMLInputElement;
-
     this.configure();
-    this.attach();
   }
 
   private getUserInputs(): [string, string, number] | void {
@@ -262,6 +276,13 @@ class ProjectInput {
       return [titleValue, descriptionValue, +peopleValue];
     }
   }
+  // usually put public method first
+  renderContent() {} // mock method to satisfy base class
+  configure() {
+    // add listeners to elements
+    // watchout for 'this' when adding eventListeners
+    this.element.addEventListener('submit', this.submitHandler);
+  }
 
   private clearInputs() {
     this.titleInputElement.value = '';
@@ -282,20 +303,6 @@ class ProjectInput {
       projectState.addProject(title, desc, people);
       this.clearInputs();
     }
-  }
-
-  // add listeners to elements
-  private configure() {
-    // watchout for 'this' when adding eventListeners
-    this.formElement.addEventListener('submit', this.submitHandler);
-  }
-
-  private attach() {
-    // beforebegin = before(elm)
-    // afterbegin = prepend(elm)
-    // beforeend = appendChild(elm)
-    // afterend = after(elm)
-    this.app.insertAdjacentElement('afterbegin', this.formElement);
   }
 }
 
