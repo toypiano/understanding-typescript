@@ -3,7 +3,7 @@
 // global & human-readable constant identifier
 enum ProjectStatus {
   Active,
-  Finished,
+  Completed,
 }
 
 class Project {
@@ -126,6 +126,7 @@ class ProjectList {
   sectionElement: HTMLElement;
   assignedProjects: Project[];
   // ts constructor shorthand
+  // not using ProjectStatus enum since we need this for string literal
   constructor(private type: 'active' | 'completed') {
     this.templateElement = document.getElementById(
       'project-list'
@@ -142,7 +143,14 @@ class ProjectList {
     // add listener: cb will be passed projects from state
     projectState.addListener((projects: Project[]) => {
       // callback will be called when new project is added to the state instance
-      this.assignedProjects = projects; // store state into local property to share across methods
+
+      const filteredProjects = projects.filter((project) => {
+        if (this.type === 'active') {
+          return project.status === ProjectStatus.Active;
+        }
+        return project.status === ProjectStatus.Completed;
+      });
+      this.assignedProjects = filteredProjects; // store state into local property to share across methods
       this.renderProjects();
     });
 
@@ -155,6 +163,9 @@ class ProjectList {
     const ulElement = document.getElementById(
       `project-list--${this.type}`
     )! as HTMLUListElement;
+    // We could've diff DOM and only render difference but
+    // they are expensive operations for this application.
+    ulElement.innerHTML = '';
     for (const projectItem of this.assignedProjects) {
       // create elem, inject data, then render
       const li = document.createElement('li');
