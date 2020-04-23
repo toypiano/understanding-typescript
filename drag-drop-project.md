@@ -34,3 +34,42 @@ if (input.minLength != null && typeof input.value === 'string') {
   isValid = isValid && input.value.length >= input.minLength;
 }
 ```
+
+## Typescript null checking
+
+### Falsy values in TS and JS
+
+```ts
+if (value) {
+  /*
+  this will run is value is not:
+    - null
+    - undefined
+    - NaN
+    - '' (empty string)
+    - 0
+    - false
+  /*
+}
+```
+
+### Checking for `null` with strict | non-strict equality
+
+```ts
+if (value != null) {
+  // runs if value is neither null nor undefined
+}
+
+if (value !== null) {
+  // will run if value is undefined
+}
+
+if (value == null) {
+  // runs if value is null OR undefined
+}
+
+if (value === null) {
+  // will run only if value is explicitly defined as null
+  // (won't run if value is undefined)
+}
+```

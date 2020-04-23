@@ -1,17 +1,41 @@
-/* State Management */
+/* Project type */
 
+// global & human-readable constant identifier
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+class Project {
+  // constructor shorthand: accessor propName: type
+  constructor(
+    public id: string,
+    public title: string,
+    public description: string,
+    public people: number,
+    public status: ProjectStatus
+  ) {}
+}
+
+/* State Management */
+// using type to denote function type in one line.
+// we don't usually care about return values from listener
+// because it generally takes some value and create some side-effects with it.
+type Listener = (items: Project[]) => void;
 /**
  * Create singleton state instance
  */
 let id = 0;
 class ProjectState {
   // start out by setting type as any
-  private listeners: any = [];
-  private projects: any[] = [];
+  private listeners: Listener[] = [];
+  private projects: Project[] = [];
 
   // ts singleton pattern
   private static instance: ProjectState;
+
   private constructor() {}
+
   static getInstance() {
     if (this.instance) {
       return this.instance;
@@ -20,17 +44,19 @@ class ProjectState {
     return this.instance;
   }
 
-  addListener(listenerFn: Function) {
+  addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
 
   addProject(title: string, description: string, people: number) {
-    const newProject = {
-      id: (id++).toString(),
+    const newProject = new Project(
+      (id++).toString(),
       title,
       description,
       people,
-    };
+      ProjectStatus.Active // by default
+    );
+
     this.projects.push(newProject);
     // When adding new project, loop through listeners and call them passing in the project list
     for (const listenerFn of this.listeners) {
@@ -98,7 +124,7 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   app: HTMLDivElement;
   sectionElement: HTMLElement;
-  assignedProjects: any[];
+  assignedProjects: Project[];
   // ts constructor shorthand
   constructor(private type: 'active' | 'completed') {
     this.templateElement = document.getElementById(
@@ -114,7 +140,7 @@ class ProjectList {
     this.sectionElement.classList.add(`project--${this.type}`);
 
     // add listener: cb will be passed projects from state
-    projectState.addListener((projects: any[]) => {
+    projectState.addListener((projects: Project[]) => {
       // callback will be called when new project is added to the state instance
       this.assignedProjects = projects; // store state into local property to share across methods
       this.renderProjects();
