@@ -317,3 +317,7 @@ Singletons in OOP is the classes that can have only one instance.
   const tMonk = TheloniousMonk.getTheloniousMonk();
   console.log(monk === tMonk); // true;
   ```
+
+## More Readings on Typescript Class
+
+- [Advanced Typescript Concepts: Classes and Types](https://www.sitepen.com/blog/advanced-typescript-concepts-classes-and-types/)
