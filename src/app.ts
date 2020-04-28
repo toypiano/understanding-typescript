@@ -166,7 +166,8 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     templateId: string,
     hostElementId: string,
     insertAtStart: boolean,
-    newElementClass?: string // optional paramter must come at the end
+    newElementClass?: string, // optional paramter must come at the end
+    newElementId?: string
   ) {
     // get host element DOM node
     this.hostElement = document.getElementById(hostElementId)! as T;
@@ -182,6 +183,9 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     this.element = importedNode.firstElementChild as U;
     if (newElementClass) {
       this.element.classList.add(newElementClass);
+    }
+    if (newElementId) {
+      this.element.id = newElementId;
     }
 
     // attach imported element to the host element
@@ -344,11 +348,45 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     // they are expensive operations for this application.
     ulElement.innerHTML = '';
     for (const projectItem of this.assignedProjects) {
-      // create elem, inject data, then render
-      const li = document.createElement('li');
-      li.textContent = projectItem.title;
-      ulElement.appendChild(li);
+      // this.element is the section element
+      new ProjectItem(this.element.querySelector('ul')!.id, projectItem);
     }
+  }
+}
+
+/**
+ * Creates list item to append to the ul element
+ */
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  // work with Project type since it has all the properties we need
+  private project: Project;
+  // set up your getter/setters below other class fields
+  get persons() {
+    if (this.project.people === 1) {
+      return '1 person';
+    } else {
+      return `${this.project.people} people`;
+    }
+  }
+
+  // hostElement is dynamically generated from ProjectList so we can't hard-code it.
+  constructor(hostId: string, project: Project) {
+    // we could've just create li instead of importing it from a template
+    // since it's a single item without any nesting elements,
+    // but to use the base class, Component, you have to work with a template
+    // (and we ended up nesting more structures within the template)
+    super('single-project', hostId, false, project.id);
+    this.project = project;
+    this.configure();
+    this.renderContent();
+  }
+
+  configure() {}
+  renderContent() {
+    this.element.querySelector('h2')!.textContent = this.project.title;
+    // use getter just like regular property
+    this.element.querySelector('h3')!.textContent = this.persons + ' assigned';
+    this.element.querySelector('p')!.textContent = this.project.description;
   }
 }
 
