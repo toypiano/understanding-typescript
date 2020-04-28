@@ -22,6 +22,7 @@ class Project {
 // we don't usually care about return values from listener
 // because it generally takes some value and create some side-effects with it.
 /**
+ * Listener functions that is passed an array of class T instances
  * @template T A class instance to store in items.
  * @param items An array of instances to pass into a listener function.
  */
@@ -39,18 +40,25 @@ class State<T> {
   }
 }
 
+/**
+ * Creates a state instance using singleton pattern
+ */
 class ProjectState extends State<Project> {
-  // start out by setting type as any
+  // state is only available through listeners from the outside
   private projects: Project[] = [];
   private static id: number = 0;
 
-  // ts singleton pattern
+  // can't access outside class
+  // doesn't exist in instance
   private static instance: ProjectState;
 
+  // can't instantiate with 'new' from outside
   private constructor() {
     super();
   }
 
+  // if instance exists, return it.
+  // if not, create and return it.
   static getInstance() {
     if (this.instance) {
       return this.instance;
@@ -59,6 +67,14 @@ class ProjectState extends State<Project> {
     return this.instance;
   }
 
+  // public instance method
+  /**
+   * Add a new Project to state and
+   * call all added listeners, passing in updated state.
+   * @param title project title
+   * @param description project description
+   * @param people number of people in project
+   */
   addProject(title: string, description: string, people: number) {
     const newProject = new Project(
       (ProjectState.id++).toString(),
