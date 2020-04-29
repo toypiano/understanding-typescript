@@ -1,5 +1,17 @@
 /* Project type */
 
+// Drag & Drop Interfaces
+interface Draggable {
+  handleDragStart(e: DragEvent): void;
+  handleDragEnd(e: DragEvent): void;
+}
+
+interface DragTarget {
+  handleDragOver(e: DragEvent): void;
+  handleDrop(e: DragEvent): void;
+  handleDragLeave(e: DragEvent): void;
+}
+
 // global & human-readable constant identifier
 enum ProjectStatus {
   Active,
@@ -357,7 +369,8 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 /**
  * Creates list item to append to the ul element
  */
-class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
+  implements Draggable {
   // work with Project type since it has all the properties we need
   private project: Project;
   // set up your getter/setters below other class fields
@@ -380,8 +393,18 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
     this.configure();
     this.renderContent();
   }
+  @autobind
+  handleDragStart(e: DragEvent) {
+    console.log(e);
+  }
+  handleDragEnd(_: DragEvent) {
+    console.log('dragend');
+  }
 
-  configure() {}
+  configure() {
+    this.element.addEventListener('dragstart', this.handleDragStart);
+    this.element.addEventListener('dragend', this.handleDragEnd);
+  }
   renderContent() {
     this.element.querySelector('h2')!.textContent = this.project.title;
     // use getter just like regular property

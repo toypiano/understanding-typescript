@@ -73,3 +73,16 @@ if (value === null) {
   // (won't run if value is undefined)
 }
 ```
+
+## Implementing drag-and-drop
+
+- Element must have `draggable` attribute set to `true` in order to be draggable.
+- On the dragging element, handle the following events:
+
+  - `dragstart`
+  - `dragend`
+
+- On the target element, handle the following events:
+  - `dragover`
+  - `drop`
+  - `dragleave`
