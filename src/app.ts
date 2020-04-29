@@ -317,12 +317,22 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     this.renderContent();
   }
   @autobind
-  handleDragOver(_: Event) {
-    // using 'this' inside handler? BIND IT!
-    const listEl = this.element.querySelector('ul')!;
-    listEl.classList.add('droppable');
+  handleDragOver(e: DragEvent) {
+    // default for 'dragover' event is to prevent firing 'drop' event
+    e.preventDefault();
+    // make it droppable only if event contains dataTransfer AND
+    // the first allowed type is 'text/plain'
+    if (e.dataTransfer && e.dataTransfer.types[0] === 'text/plain') {
+      // using 'this' inside handler? BIND IT!
+      const listEl = this.element.querySelector('ul')!;
+      listEl.classList.add('droppable');
+    }
   }
-  handleDrop(_: Event) {}
+  handleDrop(e: DragEvent) {
+    // if you check event in a console, you won't find dataTransfer property
+    // because it gets cleared right after the event is fired
+    console.log(e.dataTransfer!.getData('text/plain'));
+  }
   @autobind
   handleDragLeave() {
     const listEl = this.element.querySelector('ul')!;
@@ -411,7 +421,10 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
   }
   @autobind
   handleDragStart(e: DragEvent) {
-    console.log(e);
+    // We can transfer id and fetch the actual project from the state
+    e.dataTransfer!.setData('text/plain', this.project.id);
+    // data being dragged will be moved (not copied | linked)
+    e.dataTransfer!.effectAllowed = 'move';
   }
   handleDragEnd(_: DragEvent) {
     console.log('dragend');
