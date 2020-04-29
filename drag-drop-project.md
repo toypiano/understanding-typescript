@@ -97,4 +97,18 @@ if (value === null) {
     - `drop`
     - `dragleave`
 
--
+## Bind & Handle
+
+### TL;DR
+
+- Bind your handlers. or...
+- `this` inside handler? -> **bind me**.
+
+### You have to bind your handleSomeEvent function
+
+- If you define an event handler, that function is eventually going to get passed to the event listener.
+- That event listener is attached to the `document` object.
+- If you're naming your function as handle-something or something-handler, 99% of the time, that something is going to be an event fired from a DOM element.
+- So without binding, `this` inside handler means `document`
+- You use `this` inside handler because you want to access instance properties and methods.
+- Therefore, If you have `this` inside an event handler, bind it with the owner instance.

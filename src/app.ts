@@ -98,6 +98,25 @@ class ProjectState extends State<Project> {
 
     this.projects.push(newProject);
     // When adding new project, loop through listeners and call them passing in the project list
+    this.updateListeners();
+  }
+
+  /**
+   * Changes project status
+   */
+  moveProject(projectId: string, newStatus: ProjectStatus) {
+    const project = this.projects.find((p) => p.id === projectId);
+    // avoid re-render if status didn't change
+    // (user dropped item back to the same list)
+    // but this will still add 'droppable' class handled from 'dragover` event.
+    if (project && project.status !== newStatus) {
+      project.status = newStatus;
+      // you have to call listeners again with the updated state
+      this.updateListeners();
+    }
+  }
+
+  private updateListeners() {
     for (const listener of this.listeners) {
       listener(this.projects.slice()); // pass the copy (immutable pattern)
     }
@@ -328,11 +347,19 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
       listEl.classList.add('droppable');
     }
   }
+  @autobind
   handleDrop(e: DragEvent) {
     // if you check event in a console, you won't find dataTransfer property
     // because it gets cleared right after the event is fired
     console.log(e.dataTransfer!.getData('text/plain'));
+    const projectId = e.dataTransfer!.getData('text/plain');
+    console.log(this.type);
+    projectState.moveProject(
+      projectId,
+      this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Completed
+    );
   }
+
   @autobind
   handleDragLeave() {
     const listEl = this.element.querySelector('ul')!;
