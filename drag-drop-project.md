@@ -77,6 +77,7 @@ if (value === null) {
 ## Implementing drag-and-drop
 
 [MDN: HTML Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API)
+[JSFiddle Demo](http://jsfiddle.net/radonirinamaminiaina/zfnj5rv4/)
 
 - Element must have `draggable` attribute set to `true` in order to be draggable.
 - On the dragging element,
@@ -86,16 +87,22 @@ if (value === null) {
       - set element id to the event by calling `setData('text/plain', id)` on `event.dataTransfer.`
       - specify allowed operation with `e.dataTransfer.effectAllowed = 'move'`
     - `dragend`
+      - update something on the dragged item
+      - e.g. change opacity back to 1
 
 - On the target element,
 
   - handle the following events:
-    - `dragover`
+    - `dragover` (dragged item comes over to target)
       - call `preventDefault` to allow `drop` event
       - check if event contains `dataTransfer` which has the desirable data type in its `types` array.
       - If true, add css class to the target to give reaction to users
     - `drop`
+      - change the status of the Dragged item
+      - item status is stored in state instance
+      - So we call a method on the state instance to update its state.
     - `dragleave`
+      - remove css class
 
 ## Bind & Handle
 

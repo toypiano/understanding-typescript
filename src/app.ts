@@ -353,7 +353,6 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     // because it gets cleared right after the event is fired
     console.log(e.dataTransfer!.getData('text/plain'));
     const projectId = e.dataTransfer!.getData('text/plain');
-    console.log(this.type);
     projectState.moveProject(
       projectId,
       this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Completed
