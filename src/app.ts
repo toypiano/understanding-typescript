@@ -302,7 +302,8 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   }
 }
 
-class ProjectList extends Component<HTMLDivElement, HTMLElement> {
+class ProjectList extends Component<HTMLDivElement, HTMLElement>
+  implements DragTarget {
   // property specific to this class
   assignedProjects: Project[];
   // ts constructor shorthand
@@ -315,12 +316,27 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     this.configure();
     this.renderContent();
   }
+  @autobind
+  handleDragOver(_: Event) {
+    // using 'this' inside handler? BIND IT!
+    const listEl = this.element.querySelector('ul')!;
+    listEl.classList.add('droppable');
+  }
+  handleDrop(_: Event) {}
+  @autobind
+  handleDragLeave() {
+    const listEl = this.element.querySelector('ul')!;
+    listEl.classList.remove('droppable');
+  }
 
   /**
    * Listen to global state. When new project is added,
    * store filtered projects locally and render them.
    */
   configure() {
+    this.element.addEventListener('dragover', this.handleDragOver);
+    this.element.addEventListener('dragleave', this.handleDragLeave);
+    this.element.addEventListener('drop', this.handleDrop);
     // add listener: cb will be passed projects from state
     projectState.addListener((projects: Project[]) => {
       // callback will be called when new project is added to the state instance
