@@ -77,6 +77,7 @@ if (value === null) {
 ## Implementing drag-and-drop
 
 [MDN: HTML Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API)
+
 [JSFiddle Demo](http://jsfiddle.net/radonirinamaminiaina/zfnj5rv4/)
 
 - Element must have `draggable` attribute set to `true` in order to be draggable.
@@ -86,6 +87,15 @@ if (value === null) {
     - `dragstart`
       - set element id to the event by calling `setData('text/plain', id)` on `event.dataTransfer.`
       - specify allowed operation with `e.dataTransfer.effectAllowed = 'move'`
+      ```ts
+      @autobind
+      handleDragStart(e: DragEvent) {
+        // We can transfer id and fetch the actual project from the state
+        e.dataTransfer!.setData('text/plain', this.project.id);
+        // data being dragged will be moved (not copied | linked)
+        e.dataTransfer!.effectAllowed = 'move';
+      }
+      ```
     - `dragend`
       - update something on the dragged item
       - e.g. change opacity back to 1
@@ -97,12 +107,32 @@ if (value === null) {
       - call `preventDefault` to allow `drop` event
       - check if event contains `dataTransfer` which has the desirable data type in its `types` array.
       - If true, add css class to the target to give reaction to users
+      ```ts
+      if (e.dataTransfer && e.dataTransfer.types[0] === 'text/plain') {
+        const listEl = this.element.querySelector('ul')!;
+        listEl.classList.add('droppable');
+      }
+      ```
     - `drop`
       - change the status of the Dragged item
+        - Element id retrieved from `e.dataTransfer!.getData('text/plain)`;
       - item status is stored in state instance
       - So we call a method on the state instance to update its state.
+      ```ts
+      const projectId = e.dataTransfer!.getData('text/plain');
+      projectState.moveProject(
+        projectId,
+        this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Completed
+      );
+      ```
     - `dragleave`
       - remove css class
+      ```ts
+      handleDragLeave() {
+        const listEl = this.element.querySelector('ul')!;
+        listEl.classList.remove('droppable');
+      }
+      ```
 
 ## Bind & Handle
 
