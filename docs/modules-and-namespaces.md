@@ -216,8 +216,72 @@ But still, you can delete any references that are only needed during the runtime
 
 ## ES6 Imports / Exports
 
-- Per-file compilation but single <script> import.
-- Multiple js files need to be loaded (more request upfront)
-- You can use bundling library (e.g. webpack) to bundle them together.
+- Supported by all modern browsers (no ie9)
+- Recommended over TS namespace
+- Per-file compilation but single `<script type="module">` in `index.html`.
+- Multiple js files need to be loaded (more request upfront - bad for slow connection) without webpack.
+- You can use bundling library (e.g. webpack) to bundle files together.
 
-* "models" describe how their actual implementations will look like.
+### Update `tsconfig.json` to use ES6 import/export
+
+To use ES6 module system, change the following in `tsconfig.json`:
+
+- Change module option to "es2015" ("amd" for `outFile`)
+- Disable `outFile` option
+
+```json
+{
+  "compilerOptions": {
+    ...
+    "module": "es2015"
+    ...
+    //"outFile": "./dist/bundle.js"
+    ...
+```
+
+### Add script as module type in `index.html`
+
+```html
+<head>
+  ...
+  <script type="module" src="dist/app.js" defer></script>
+  ...
+</head>
+```
+
+### Import as `.js` file
+
+You must add `.js` to your importing path to import the file as JS file (not TS).
+
+### Use named imports/exports
+
+- Default export can be renamed to anything when importing
+- Enforce your naming scheme by using named export/import
+
+`src/components/base-components.ts`
+
+```js
+export abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+  ...
+```
+
+`src/components/project-item.ts`
+
+```js
+import { Component } from './base-component.js';
+```
+
+- "models" describe how their actual implementations will look like.
+
+## JS imports a single instance
+
+If a class instance is created and exported in one file, and then imported in other files, JS runs the instantiation once when the instance is imported for the first time and uses the same instance for all the other imports.
+
+`/src/state/project-state.ts`
+
+```js
+// this only prints once
+console.log('instantiating projectState...');
+// we only have one instance of ProjectState in our entire application
+export const projectState = ProjectState.getInstance();
+```
