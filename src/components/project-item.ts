@@ -6,6 +6,13 @@ import { autobind } from '../decorators/autobind';
 export class ProjectItem extends Component<HTMLLIElement, HTMLUListElement>
   implements Draggable {
   private project: Project;
+  get persons() {
+    if (this.project.people === 1) {
+      return '1 person';
+    } else {
+      return `${this.project.people} people`;
+    }
+  }
   constructor(hostId: string, project: Project) {
     super('single-project', hostId, false, project.id);
     this.project = project;
