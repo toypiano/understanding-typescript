@@ -265,3 +265,92 @@ $ yarn build
 Now `bundle.js` file is created in "dist/" folder.
 
 Put the bundled js file along with html and css file to the server to deploy your application.
+
+## Webpack.config (without comments)
+
+`webpack.config.js`
+
+```js
+const path = require('path');
+module.exports = {
+  mode: 'development',
+  entry: './src/app.ts',
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+    publicPath: 'dist',
+  },
+  devtool: 'inline-source-map',
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+    ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+};
+```
+
+`webpack.config.prod.js`
+
+```js
+const path = require('path');
+const CleanPlugin = require('clean-webpack-plugin');
+
+module.exports = {
+  mode: 'production',
+  entry: './src/app.ts',
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  devtool: 'none',
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  plugins: [new CleanPlugin.CleanWebpackPlugin()],
+};
+```
+
+`package.json`
+
+```json
+{
+  "name": "ts",
+  "version": "1.0.0",
+  "description": "## TypeScript Course for Beginners 2020",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server",
+    "build": "webpack --config webpack.config.prod.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lite-server": "^2.5.4"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "ts-loader": "^7.0.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
+  }
+}
+```
