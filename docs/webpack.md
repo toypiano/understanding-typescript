@@ -12,7 +12,7 @@ Using webpack has the following advantages:
 - Minify code for faster download
 - Dev-server and many other build tools / steps
 
-## Install and Important Dependencies
+## Install Webpack and Important Dependencies
 
 ```bash
 yarn add --dev webpack wepack-cli webpack-dev-server typescript ts-loader
