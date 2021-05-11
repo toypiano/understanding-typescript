@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "lite-server": "^2.5.4",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.150",
